@@ -1,0 +1,18 @@
+\makeatletter
+\def\input@path{{pgfblockio}{..}{../pgfblockio}}
+\makeatother
+
+\input{block-header.tex}
+
+
+\begin{document}
+\begin{tikzpicture}
+
+\node {DiamondLight};
+
+% Margin around
+\useasboundingbox	([shift={(5mm,5mm)}]current bounding box.north east) rectangle
+					([shift={(-5mm,-5mm)}]current bounding box.south west);
+\node[anchor=south east,font=\tiny] at (current bounding box.south east) {\today};
+\end{tikzpicture}
+\end{document}
