@@ -8,11 +8,100 @@
 \begin{document}
 \begin{tikzpicture}
 
-\node {DiamondLight};
+
+\blkioset{block/HW/.style={
+	min depth east=6mm,
+	min depth south=3mm,
+	style={append after command={node[gray,below right= 0mm of \blkioname.block south east,font=\tiny] {HW} } }
+	}}
+
+%
+% Panel
+%
+\def\PanelDefine#1#2{
+	\begin{blockio}[HW,name=P#1,#2,text style={font=\tiny}]{\normalsize Panel #1\\ 8x 5 RGB \\ 8x 4 White}
+	
+		\iopin[west,in,name=P#1RGBDI]{RGB Data In}
+		\iopin[west,name=P#1WPWR]{White Power}
+		\iopin[west,name=P#1RGBPWR]{RGB Power}
+		\iopin[west,out,name=P#1RGBDO]{RGB Data Out}
+	
+	\end{blockio}
+}
+
+\PanelDefine{1}{}
+\PanelDefine{2}{below=5mm of P1}
+\PanelDefine{3}{below=5mm of P2}
+
+\linkio[via=(P1.sw1)]{P1RGBDO}{P2RGBDI}
+\linkio[via=(P2.sw1)]{P2RGBDO}{P3RGBDI}
+
+%
+% Power Regulators and Control
+%
+
+\begin{blockio}[HW,min span west down=10mm,
+				block style={left=0mm of P3.sw8,anchor=se2},
+				name=PWR]{Power \\Regulator \& Control}
+
+	\iopin[south]{Power In}
+
+	\iopin[west up]{RGB Enable}
+	\iopin[west]{White 1 PWM}
+	\iopin[west]{White 2 PWM}
+	\iopin[west]{White 3 PWM}
+
+	
+	\iopin[east,out]{White 1 Power}
+	\iopin[east,out]{White 2 Power}
+	\iopin[east,out]{White 3 Power}
+	
+	\iopin[east down,out]{RGB Power}
+	
+	\iopin[west down,out]{Micro Power}
+\end{blockio}
+
+\linkio[via=(PWR.ne5)]{RGB Power}{P1RGBPWR}
+\linkio[via=(PWR.ne5)]{RGB Power}{P2RGBPWR}
+\linkio[via=(PWR.ne5)]{RGB Power}{P3RGBPWR}
+\linkio[via=(PWR.ne1)]{White 1 Power}{P1WPWR}
+\linkio[via=(PWR.ne2)]{White 2 Power}{P2WPWR}
+\linkio[via=(PWR.ne3)]{White 3 Power}{P3WPWR}
+
+%
+% Micro Control
+%
+
+\begin{blockio}[above left=0 and 20mm of PWR.west]{ESP32}
+
+	\iopin[east up,out]{RGB Data}
+	\iopin[east up,out]{RGB En}
+	\iopin[east down,out]{PWM 1}
+	\iopin[east down,out]{PWM 2}
+	\iopin[east down,out]{PWM 3}	
+	
+	\iopin[south]{Power}
+	
+	\iopin[west]{Encoder}
+	\iopin[west]{Switch}
+	
+\end{blockio}
+
+\linkio[via=(PWR.north east)]{RGB Data}{P1RGBDI}
+
+\linkio[via=(PWR.nw1)]{RGB En}{RGB Enable}
+
+\linkio[via=(PWR.nw2)]{PWM 1}{White 1 PWM}
+\linkio[via=(PWR.nw3)]{PWM 2}{White 2 PWM}
+\linkio[via=(PWR.nw4)]{PWM 3}{White 3 PWM}
+
+\linkio{Micro Power}{Power}
 
 % Margin around
 \useasboundingbox	([shift={(5mm,5mm)}]current bounding box.north east) rectangle
 					([shift={(-5mm,-5mm)}]current bounding box.south west);
-\node[anchor=south east,font=\tiny] at (current bounding box.south east) {\today};
+\node[above left=0 of current bounding box,font=\tiny]{\today};
+
+\node[below=0 of current bounding box.north] {Diamond Light / Ring Light};
 \end{tikzpicture}
 \end{document}
