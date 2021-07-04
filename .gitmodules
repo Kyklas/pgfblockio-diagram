@@ -1,0 +1,3 @@
+[submodule "pgfblockio"]
+	path = pgfblockio
+	url = git@github.com:Kyklas/pgfblockio.git
