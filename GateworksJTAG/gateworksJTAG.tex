@@ -1,0 +1,173 @@
+\makeatletter
+\def\input@path{{pgfblockio}{..}{../pgfblockio}}
+\makeatother
+
+\input{block-header.tex}
+
+
+\begin{document}
+\begin{tikzpicture}
+
+\begin{blockio}[name=LS1]{LS Input}
+
+	\iopin[north]{VB}
+	\iopin[north,in]{LS-11-TDO}
+	\iopin[north,in]{LS-13-Rx}
+	\iopin[north]{GND}
+	
+	\iopin[south]{VA}
+	\iopin[south,out]{LS-18-DI}
+	\iopin[south,out]{LS-39-Rx}
+	\iopin[south]{GND}
+\end{blockio}
+
+\begin{blockio}[right=2 of LS1,name=LS2]{SRST}
+
+	\iopin[north]{VB}
+	\iopin[north,out]{LS-12-SRST}
+	\iopin[north,in]{R100k-GND1}
+	\iopin[north]{LS-22-GPIOL1}
+	
+	\iopin[south]{VA}
+	\iopin[south,in]{R100k-GND2}
+	\iopin[south,in]{R100k-GND2}
+	\iopin[south]{GND}
+\end{blockio}
+
+\node[rotate=90,align=left,anchor=south,at=(LS2.west)]{SRST is controlled by GPIOL1\\GPIOL1 High : drives low\\ GPIOL1 Low: Input/HiZ};
+
+\begin{blockio}[right=2 of LS2,name=LS3]{JTAG1}
+
+	\iopin[north]{VB}
+	\iopin[north,out]{LS-7-TMS}
+	\iopin[north,out]{LS-9-TCK}
+	\iopin[north,name=DIR1]{LS-23-GPIOL2}
+	
+	\iopin[south]{VA}
+	\iopin[south,in]{LS-19-CS}
+	\iopin[south,in]{LS-16-SK}
+	\iopin[south]{GND}
+\end{blockio}
+
+\node[rotate=90,align=left,anchor=south,at=(LS3.west)]{JTAG is controlled by GPIOL2\\GPIOL2 High : JTAG Output\\ GPIOL2 Low: Input/HiZ};
+
+\begin{blockio}[right=2 of LS3,name=LS4]{JTAG2}
+
+	\iopin[north]{VB}
+	\iopin[north,out]{LS-3-TRST}
+	\iopin[north,out]{LS-5-TDI}
+	\iopin[north,name=DIR2]{LS-23-GPIOL2}
+	
+	\iopin[south]{VA}
+	\iopin[south,in]{LS-21-GPIOL0}
+	\iopin[south,in]{LS-17-DO}
+	\iopin[south]{GND}
+\end{blockio}
+
+
+\begin{blockio}[right=2 of LS4,name=LS5]{LS Output}
+
+	\iopin[north]{VB}
+	\iopin[north,out]{LS-2-Tx}
+	\iopin[north,out]{}
+	\iopin[north]{VA}
+	
+	\iopin[south]{VA}
+	\iopin[south,in]{LS-38-Tx}
+	\iopin[south,in]{GND}
+	\iopin[south]{GND}
+\end{blockio}
+
+\begin{blockio}[above=2 of LS3,name=HEADER]{}
+
+
+	\iopin[north,out]{13-RX-IN}
+	\iopin[north,out]{11-TDO}
+	\iopin[north,in]{9-TCK}
+	\iopin[north,in]{7-TMS}
+	\iopin[north,in]{5-TDI}
+	\iopin[north,in]{3-TRST}
+	\iopin[north,in]{1-VB}
+	
+	\iopin[south,out]{14-GND}
+	\iopin[south,in]{12-SRST}
+	\iopin[south,out]{10-GND}
+	\iopin[south,out]{8-GND}
+	\iopin[south,out]{6-GND}
+	\iopin[south,out]{4-GND}
+	\iopin[south,in]{2-TX-OUT}
+
+
+\end{blockio}
+
+\linkio[via=(HEADER.nw1)]{13-RX-IN}{LS-13-Rx}
+\linkio[via=(HEADER.nw2)]{11-TDO}{LS-11-TDO}
+
+\linkio[]{HEADER.ne1}{3-TRST}
+\linkio[]{HEADER.ne2}{5-TDI}
+\linkio[]{HEADER.ne3}{7-TMS}
+\linkio[]{HEADER.ne4}{9-TCK}
+
+\linkio[via=(HEADER.se2)]{LS-7-TMS}{HEADER.ne3}
+\linkio[via=(HEADER.se3)]{LS-9-TCK}{HEADER.ne4}
+
+\linkio[]{LS-3-TRST}{HEADER.ne1}
+\linkio[]{LS-5-TDI}{HEADER.ne2}
+
+\linkio[via=(HEADER.sw1)]{LS-12-SRST}{12-SRST}
+\linkio[via=(HEADER.se1)]{LS-2-Tx}{2-TX-OUT}
+
+\linkio[V]{LS2.se1}{LS-22-GPIOL1.in}
+
+\linkio[V]{LS3.se1}{DIR1.in}
+\linkio[V]{LS4.se2}{DIR2.in}
+\linkio[V]{LS3.se1}{LS4.se2}
+
+
+\begin{blockio}[below=5 of LS3,name=FTDI]{FTDI\\FT2232H}
+
+	\iopin[west down,out]{16-SK}
+	
+	\iopin[south,out]{17-DO}
+	\iopin[south,in]{18-DI}
+	\iopin[south,out]{19-CS}
+	\iopin[south,out]{21-GPIOL0}
+	\iopin[south,out]{22-GPIOL1}
+	\iopin[south,out]{23-GPIOL2}
+
+	\iopin[east,out]{38-PORTB-TXD}
+	\iopin[east]{39-PORTB-RXD}
+
+\end{blockio}
+
+\linkio[via=(FTDI.se1)]{23-GPIOL2}{LS4.se2}
+\linkio[via=(FTDI.se2)]{22-GPIOL1}{LS4.se3}
+\coordinate (ref) at (LS4.se4|-LS4.se1);
+\linkio[via=(FTDI.se3)]{21-GPIOL0}{ref}
+
+\linkio[]{ref}{LS-21-GPIOL0}
+\linkio[]{LS4.se3}{LS2.se1}
+
+
+\linkio[]{38-PORTB-TXD}{LS-38-Tx}
+
+\linkio[by=(FTDI.nw1)]{16-SK}{LS-16-SK}
+
+\linkio[via=(FTDI.sw2)]{LS-18-DI}{18-DI}
+
+\linkio[by=(FTDI.ne2)]{LS-39-Rx}{39-PORTB-RXD}
+
+\linkio[via=(FTDI.sw6)]{19-CS}{FTDI.nw7}
+\linkio[]{FTDI.nw7}{LS-19-CS}
+
+\linkio[via=(FTDI.sw4)]{17-DO}{FTDI.nw6}
+\linkio[]{FTDI.nw6}{LS-17-DO}
+
+% Margin around
+\useasboundingbox	([shift={(5mm,5mm)}]current bounding box.north east) rectangle
+					([shift={(-5mm,-5mm)}]current bounding box.south west);
+\node[above left=0 of current bounding box,font=\tiny]{\today};
+
+\node[below=0 of current bounding box.north] {Gateworks JTAG};
+\end{tikzpicture}
+\end{document}
